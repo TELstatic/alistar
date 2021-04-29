@@ -74,7 +74,4 @@ class ManagerFile(admin.ModelAdmin):
     preview.action_type = 2
     preview.action_url = settings.QINIU_HOST + '/files/'
 
-    class Meta:
-        verbose_name = "文件"
-
 admin.site.register(File, ManagerFile)
