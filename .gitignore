@@ -1,3 +1,4 @@
-config.ini
-.qiniu_pythonsdk_hostscache.json
 .idea
+src/settings.py
+db.sqlite3
+static/

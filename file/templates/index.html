@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/iview/3.5.5-rc.1/styles/iview.min.css" rel="stylesheet">
+</head>
+<body>
+<span style="display: none;">{% verbatim %}</span>
+<div id="app">
+    <i-table :columns="columns" :data="data">
+        <template slot-scope="{ row, index }" slot="link">
+            <a target="_blank" :href="formatLink(row)">{{formatLink(row)}}</a>
+        </template>
+        <template slot-scope="{ row, index }" slot="action">
+            <i-button :to="formatLink(row)" size="small" type="primary" target="_blank">下载</i-button>
+        </template>
+    </i-table>
+</div>
+<span style="display: none;">{% endverbatim %}</span>
+</body>
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.12/vue.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/iview/3.5.5-rc.1/iview.min.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            url: '',
+            data: [],
+            columns: [
+                {
+                    "title": "标题",
+                    "key": "title"
+                },
+                {
+                    "title": "文件名",
+                    "key": "name"
+                },
+                {
+                    "title": "备注",
+                    "key": "memo"
+                },
+                {
+                    "title": "下载链接",
+                    "slot": "link"
+                },
+                {
+                    "title": "操作",
+                    "slot": "action"
+                }
+            ],
+        },
+        mounted() {
+            var json = location.origin + '/' + location.pathname.replace('/index.html', '').replaceAll('/', '') + '.json';
+
+            var url = location.href;
+
+            axios.head(json).then(() => {
+                this.getData(json);
+            }).catch(() => {
+                this.getData(url);
+            });
+        },
+        methods: {
+            getData(url) {
+                axios.get(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                }).then(res => {
+                    this.data = res.data.data;
+                    this.url = res.data.url;
+                    document.title = res.data.title;
+                });
+            },
+            formatLink(row) {
+                if (row.link.startsWith(this.url)) {
+                    return row.link;
+                }
+
+                return this.url + row.link;
+            },
+        },
+    });
+</script>
+</html>
