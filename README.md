@@ -1,6 +1,5 @@
 # Alistar
 
-> 我的常用软件和系统镜像库
+> 基于 Django 的文件备份系统
 
-* [软件库](https://cdn.telstatic.xyz/softs/)
-* [系统库](https://cdn.telstatic.xyz/mirrors/)
+将备份文件上传到七牛云后,自动生成对应的预览界面. 
