@@ -70,7 +70,74 @@ class ManagerFile(AjaxAdmin):
 
     search_fields = ('title', 'name', 'memo')
 
-    actions = ['sync', 'preview', 'review']
+    actions = ['sync', 'preview', 'review', 'fetch']
+
+    def fetch(self, request, queryset):
+        access_key = settings.QINIU_ACCESS_KEY
+        secret_key = settings.QINIU_SECRET_KEY
+        bucket = settings.QINIU_BUCKET
+        host = settings.QINIU_HOST
+
+        auth = Auth(access_key, secret_key)
+        bucketManager = BucketManager(auth)
+
+        url = request.POST['link']
+        key = os.path.basename(url)
+
+        bucketManager.fetch(url, bucket, key)
+
+        soft = Soft()
+
+        soft.title = request.POST['title']
+        soft.name = request.POST['name']
+        soft.link = host + '/' + key
+        soft.memo = request.POST['memo']
+
+        soft.save()
+
+        return JsonResponse({
+            'status': 'success',
+            'msg': '处理成功！'
+        })
+
+    fetch.short_description = '抓取'
+    fetch.icon = 'el-icon-link'
+    fetch.type = 'primary'
+    fetch.style = 'color:rainbow;'
+
+    fetch.layer = {
+        'title': '远程抓取文件',
+        'tips': '请填写合法的链接',
+        'confirm_button': '确认',
+        'cancel_button': '取消',
+        'width': '50%',
+        'params': [
+            {
+                'type': 'input',
+                'key': 'title',
+                'label': '标题',
+                'require': True
+            },
+            {
+                'type': 'input',
+                'key': 'name',
+                'label': '名称',
+                'require': True
+            },
+            {
+                'type': 'input',
+                'key': 'link',
+                'label': '链接',
+                'require': True
+            },
+            {
+                'type': 'input',
+                'key': 'memo',
+                'label': '备注',
+                'require': True
+            },
+        ],
+    }
 
     def preview(self, request, queryset):
         return True
@@ -207,7 +274,7 @@ class ManagerSoft(AjaxAdmin):
 
     search_fields = ('title', 'name', 'memo')
 
-    actions = ['sync', 'preview', 'review']
+    actions = ['sync', 'preview', 'review', 'fetch']
 
     def preview(self, request, queryset):
         return True
@@ -271,6 +338,73 @@ class ManagerSoft(AjaxAdmin):
         'confirm_button': '确认',
         'cancel_button': '取消',
         'width': '50%',
+    }
+
+    def fetch(self, request, queryset):
+        access_key = settings.QINIU_ACCESS_KEY
+        secret_key = settings.QINIU_SECRET_KEY
+        bucket = settings.QINIU_BUCKET
+        host = settings.QINIU_HOST
+
+        auth = Auth(access_key, secret_key)
+        bucketManager = BucketManager(auth)
+
+        url = request.POST['link']
+        key = os.path.basename(url)
+
+        bucketManager.fetch(url, bucket, key)
+
+        soft = Soft()
+
+        soft.title = request.POST['title']
+        soft.name = request.POST['name']
+        soft.link = host + '/' + key
+        soft.memo = request.POST['memo']
+
+        soft.save()
+
+        return JsonResponse({
+            'status': 'success',
+            'msg': '处理成功！'
+        })
+
+    fetch.short_description = '抓取'
+    fetch.icon = 'el-icon-link'
+    fetch.type = 'primary'
+    fetch.style = 'color:rainbow;'
+
+    fetch.layer = {
+        'title': '远程抓取文件',
+        'tips': '请填写合法的链接',
+        'confirm_button': '确认',
+        'cancel_button': '取消',
+        'width': '50%',
+        'params': [
+            {
+                'type': 'input',
+                'key': 'title',
+                'label': '标题',
+                'require': True
+            },
+            {
+                'type': 'input',
+                'key': 'name',
+                'label': '名称',
+                'require': True
+            },
+            {
+                'type': 'input',
+                'key': 'link',
+                'label': '链接',
+                'require': True
+            },
+            {
+                'type': 'input',
+                'key': 'memo',
+                'label': '备注',
+                'require': True
+            },
+        ],
     }
 
     preview.short_description = '查看'
@@ -344,7 +478,74 @@ class ManagerMirror(AjaxAdmin):
 
     search_fields = ('title', 'name', 'memo')
 
-    actions = ['sync', 'preview', 'review']
+    actions = ['sync', 'preview', 'review', 'fetch']
+
+    def fetch(self, request, queryset):
+        access_key = settings.QINIU_ACCESS_KEY
+        secret_key = settings.QINIU_SECRET_KEY
+        bucket = settings.QINIU_BUCKET
+        host = settings.QINIU_HOST
+
+        auth = Auth(access_key, secret_key)
+        bucketManager = BucketManager(auth)
+
+        url = request.POST['link']
+        key = os.path.basename(url)
+
+        bucketManager.fetch(url, bucket, key)
+
+        soft = Soft()
+
+        soft.title = request.POST['title']
+        soft.name = request.POST['name']
+        soft.link = host + '/' + key
+        soft.memo = request.POST['memo']
+
+        soft.save()
+
+        return JsonResponse({
+            'status': 'success',
+            'msg': '处理成功！'
+        })
+
+    fetch.short_description = '抓取'
+    fetch.icon = 'el-icon-link'
+    fetch.type = 'primary'
+    fetch.style = 'color:rainbow;'
+
+    fetch.layer = {
+        'title': '远程抓取文件',
+        'tips': '请填写合法的链接',
+        'confirm_button': '确认',
+        'cancel_button': '取消',
+        'width': '50%',
+        'params': [
+            {
+                'type': 'input',
+                'key': 'title',
+                'label': '标题',
+                'require': True
+            },
+            {
+                'type': 'input',
+                'key': 'name',
+                'label': '名称',
+                'require': True
+            },
+            {
+                'type': 'input',
+                'key': 'link',
+                'label': '链接',
+                'require': True
+            },
+            {
+                'type': 'input',
+                'key': 'memo',
+                'label': '备注',
+                'require': True
+            },
+        ],
+    }
 
     def preview(self, request, queryset):
         return True
