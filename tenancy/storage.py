@@ -1,7 +1,8 @@
-from django.core.files.storage import FileSystemStorage
-from django.conf import settings
-from qiniu import Auth, put_data
 import re
+
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+from qiniu import Auth, put_data
 
 
 class QiniuStorage(FileSystemStorage):

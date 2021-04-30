@@ -1,14 +1,17 @@
+import json
+import os
+import re
+
+from django.conf import settings
 from django.contrib import admin
-from qiniu import Auth, put_file, CdnManager, put_data
+from django.http import JsonResponse
+from qiniu import Auth, put_data, BucketManager
+from qiniu import put_file, CdnManager
+from simpleui.admin import AjaxAdmin
+
 from .models import File, FileSerializer
 from .models import Mirror, MirrorSerializer
 from .models import Soft, SoftSerializer
-from django.conf import settings
-import os
-import json
-from django.utils.html import format_html
-from django.http import JsonResponse
-from simpleui.admin import AjaxAdmin
 
 
 class ManagerFile(AjaxAdmin):
@@ -17,17 +20,40 @@ class ManagerFile(AjaxAdmin):
     admin.site.site_title = settings.APP_NAME
     admin.site.site_header = settings.APP_NAME
 
+    def delete_model(self, request, obj):
+        filename = str(obj.link)
+        access_key = settings.QINIU_ACCESS_KEY
+        secret_key = settings.QINIU_SECRET_KEY
+        bucket = settings.QINIU_BUCKET
+        host = settings.QINIU_HOST
+
+        auth = Auth(access_key, secret_key)
+
+        bucketManager = BucketManager(auth)
+
+        obj.delete()
+
+        if (filename.startswith(host)):
+            bucketManager.delete(bucket, filename.replace(host + '/', ''))
+            return True
+
+        if not re.match(r'^https?:/{2}\w.+$', filename):
+            bucketManager.delete(bucket, filename)
+            return True
+
+        return True
+
     search_fields = ('title', 'name', 'memo')
 
     actions = ['sync', 'preview', 'review']
 
-    def preview(self, row, request):
+    def preview(self, request, queryset):
         return True
 
-    def review(self, row, request):
+    def review(self, request, queryset):
         return True
 
-    def sync(self, row, request):
+    def sync(self, request, queryset):
         access_key = settings.QINIU_ACCESS_KEY
         secret_key = settings.QINIU_SECRET_KEY
         bucket = settings.QINIU_BUCKET
@@ -87,14 +113,14 @@ class ManagerFile(AjaxAdmin):
 
     preview.short_description = '查看'
     preview.icon = 'el-icon-link'
-    preview.type = 'primary'
+    preview.type = 'success'
     preview.style = 'color:rainbow;'
     preview.action_type = 2
     preview.action_url = settings.QINIU_HOST + '/files/'
 
     review.short_description = '预览'
-    review.icon = 'el-icon-link'
-    review.type = 'primary'
+    review.icon = 'el-icon-view'
+    review.type = 'info'
     review.style = 'color:rainbow;'
     review.action_type = 2
     review.action_url = '/files'
@@ -103,10 +129,28 @@ class ManagerFile(AjaxAdmin):
 class ManagerSoft(AjaxAdmin):
     list_display = ('title', 'name', 'link', 'memo')
 
-    def url(self, obj):
-        return format_html('<a href="' + str(obj.link) + '">' + str(obj.link) + '</a>')
+    def delete_model(self, request, obj):
+        filename = str(obj.link)
+        access_key = settings.QINIU_ACCESS_KEY
+        secret_key = settings.QINIU_SECRET_KEY
+        bucket = settings.QINIU_BUCKET
+        host = settings.QINIU_HOST
 
-    url.short_description = '链接'
+        auth = Auth(access_key, secret_key)
+
+        bucketManager = BucketManager(auth)
+
+        obj.delete()
+
+        if (filename.startswith(host)):
+            bucketManager.delete(bucket, filename.replace(host + '/', ''))
+            return True
+
+        if not re.match(r'^https?:/{2}\w.+$', filename):
+            bucketManager.delete(bucket, filename)
+            return True
+
+        return True
 
     admin.site.site_title = settings.APP_NAME
     admin.site.site_header = settings.APP_NAME
@@ -115,13 +159,13 @@ class ManagerSoft(AjaxAdmin):
 
     actions = ['sync', 'preview', 'review']
 
-    def preview(self, row, request):
+    def preview(self, request, queryset):
         return True
 
-    def review(self, row, request):
+    def review(self, request, queryset):
         return True
 
-    def sync(self, row, request):
+    def sync(self, request, queryset):
         access_key = settings.QINIU_ACCESS_KEY
         secret_key = settings.QINIU_SECRET_KEY
         bucket = settings.QINIU_BUCKET
@@ -181,14 +225,14 @@ class ManagerSoft(AjaxAdmin):
 
     preview.short_description = '查看'
     preview.icon = 'el-icon-link'
-    preview.type = 'primary'
+    preview.type = 'success'
     preview.style = 'color:rainbow;'
     preview.action_type = 2
     preview.action_url = settings.QINIU_HOST + '/softs/'
 
     review.short_description = '预览'
-    review.icon = 'el-icon-link'
-    review.type = 'primary'
+    review.icon = 'el-icon-view'
+    review.type = 'info'
     review.style = 'color:rainbow;'
     review.action_type = 2
     review.action_url = '/softs'
@@ -200,17 +244,40 @@ class ManagerMirror(AjaxAdmin):
     admin.site.site_title = settings.APP_NAME
     admin.site.site_header = settings.APP_NAME
 
+    def delete_model(self, request, obj):
+        filename = str(obj.link)
+        access_key = settings.QINIU_ACCESS_KEY
+        secret_key = settings.QINIU_SECRET_KEY
+        bucket = settings.QINIU_BUCKET
+        host = settings.QINIU_HOST
+
+        auth = Auth(access_key, secret_key)
+
+        bucketManager = BucketManager(auth)
+
+        obj.delete()
+
+        if (filename.startswith(host)):
+            bucketManager.delete(bucket, filename.replace(host + '/', ''))
+            return True
+
+        if not re.match(r'^https?:/{2}\w.+$', filename):
+            bucketManager.delete(bucket, filename)
+            return True
+
+        return True
+
     search_fields = ('title', 'name', 'memo')
 
     actions = ['sync', 'preview', 'review']
 
-    def preview(self, row, request):
+    def preview(self, request, queryset):
         return True
 
-    def review(self, row, request):
+    def review(self, request, queryset):
         return True
 
-    def sync(self, row, request):
+    def sync(self, request, queryset):
         access_key = settings.QINIU_ACCESS_KEY
         secret_key = settings.QINIU_SECRET_KEY
         bucket = settings.QINIU_BUCKET
@@ -270,14 +337,14 @@ class ManagerMirror(AjaxAdmin):
 
     preview.short_description = '查看'
     preview.icon = 'el-icon-link'
-    preview.type = 'primary'
+    preview.type = 'success'
     preview.style = 'color:rainbow;'
     preview.action_type = 2
     preview.action_url = settings.QINIU_HOST + '/mirrors/'
 
     review.short_description = '预览'
-    review.icon = 'el-icon-link'
-    review.type = 'primary'
+    review.icon = 'el-icon-view'
+    review.type = 'info'
     review.style = 'color:rainbow;'
     review.action_type = 2
     review.action_url = '/mirrors'
