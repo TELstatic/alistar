@@ -82,7 +82,7 @@ class ManagerFile(AjaxAdmin):
         bucketManager = BucketManager(auth)
 
         url = request.POST['link']
-        key = os.path.basename(url)
+        key = 'files/' + os.path.basename(url)
 
         bucketManager.fetch(url, bucket, key)
 
@@ -350,7 +350,7 @@ class ManagerSoft(AjaxAdmin):
         bucketManager = BucketManager(auth)
 
         url = request.POST['link']
-        key = os.path.basename(url)
+        key = 'softs/' + os.path.basename(url)
 
         bucketManager.fetch(url, bucket, key)
 
@@ -490,7 +490,7 @@ class ManagerMirror(AjaxAdmin):
         bucketManager = BucketManager(auth)
 
         url = request.POST['link']
-        key = os.path.basename(url)
+        key = 'mirrors/' + os.path.basename(url)
 
         bucketManager.fetch(url, bucket, key)
 
