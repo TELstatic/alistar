@@ -5,7 +5,7 @@ import re
 from django.conf import settings
 from django.contrib import admin
 from django.http import JsonResponse
-from qiniu import Auth, put_data, BucketManager
+from qiniu import Auth, put_data, BucketManager, build_batch_delete
 from qiniu import put_file, CdnManager
 from simpleui.admin import AjaxAdmin
 
@@ -19,6 +19,31 @@ class ManagerFile(AjaxAdmin):
 
     admin.site.site_title = settings.APP_NAME
     admin.site.site_header = settings.APP_NAME
+
+    def delete_queryset(self, request, queryset):
+        access_key = settings.QINIU_ACCESS_KEY
+        secret_key = settings.QINIU_SECRET_KEY
+        bucket = settings.QINIU_BUCKET
+        host = settings.QINIU_HOST
+
+        auth = Auth(access_key, secret_key)
+
+        bucketManager = BucketManager(auth)
+
+        keys = []
+
+        for item in queryset:
+            filename = str(item.link)
+            if (filename.startswith(host)):
+                filename = filename.replace(host + '/', '')
+            else:
+                if re.match(r'^https?:/{2}\w.+$', filename):
+                    continue
+            keys.append(filename)
+
+        bucketManager.batch(build_batch_delete(bucket, keys))
+
+        queryset.delete()
 
     def delete_model(self, request, obj):
         filename = str(obj.link)
@@ -128,6 +153,31 @@ class ManagerFile(AjaxAdmin):
 
 class ManagerSoft(AjaxAdmin):
     list_display = ('title', 'name', 'link', 'memo')
+
+    def delete_queryset(self, request, queryset):
+        access_key = settings.QINIU_ACCESS_KEY
+        secret_key = settings.QINIU_SECRET_KEY
+        bucket = settings.QINIU_BUCKET
+        host = settings.QINIU_HOST
+
+        auth = Auth(access_key, secret_key)
+
+        bucketManager = BucketManager(auth)
+
+        keys = []
+
+        for item in queryset:
+            filename = str(item.link)
+            if (filename.startswith(host)):
+                filename = filename.replace(host + '/', '')
+            else:
+                if re.match(r'^https?:/{2}\w.+$', filename):
+                    continue
+            keys.append(filename)
+
+        bucketManager.batch(build_batch_delete(bucket, keys))
+
+        queryset.delete()
 
     def delete_model(self, request, obj):
         filename = str(obj.link)
@@ -243,6 +293,31 @@ class ManagerMirror(AjaxAdmin):
 
     admin.site.site_title = settings.APP_NAME
     admin.site.site_header = settings.APP_NAME
+
+    def delete_queryset(self, request, queryset):
+        access_key = settings.QINIU_ACCESS_KEY
+        secret_key = settings.QINIU_SECRET_KEY
+        bucket = settings.QINIU_BUCKET
+        host = settings.QINIU_HOST
+
+        auth = Auth(access_key, secret_key)
+
+        bucketManager = BucketManager(auth)
+
+        keys = []
+
+        for item in queryset:
+            filename = str(item.link)
+            if (filename.startswith(host)):
+                filename = filename.replace(host + '/', '')
+            else:
+                if re.match(r'^https?:/{2}\w.+$', filename):
+                    continue
+            keys.append(filename)
+
+        bucketManager.batch(build_batch_delete(bucket, keys))
+
+        queryset.delete()
 
     def delete_model(self, request, obj):
         filename = str(obj.link)
